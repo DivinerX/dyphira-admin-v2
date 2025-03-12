@@ -121,7 +121,7 @@ export const UserDetail: React.FC<Props> = ({ user, onBack }) => {
                       <div className="flex items-center">
                         <Star className="h-4 w-4 text-yellow-400 mr-1" />
                         <span className="text-white">
-                          {Object.values(interview.score).reduce((sum, score) => sum + (score || 0), 0)}
+                          {Math.round(Object.values(interview.score).reduce((sum, score) => sum + (score || 0), 0) / Object.keys(interview.score).length)}
                         </span>
                       </div>
                     ) : (
