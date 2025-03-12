@@ -4,10 +4,12 @@ import { LoginPage } from './components/LoginPage';
 import { UserList } from './components/UserList';
 import { UserDetail } from './components/UserDetail';
 import { User } from './types';
+import { store } from './redux/store';
+import { Provider } from 'react-redux';
 
 function Dashboard() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const { auth, logout } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <div className="min-h-screen bg-gray-900">
@@ -18,7 +20,7 @@ function Dashboard() {
               <h1 className="text-white text-xl font-bold">Admin Dashboard</h1>
             </div>
             <div className="flex items-center">
-              <span className="text-gray-300 mr-4">{auth.user?.email}</span>
+              <span className="text-gray-300 mr-4">{user?.email}</span>
               <button
                 onClick={logout}
                 className="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700"
@@ -43,9 +45,11 @@ function Dashboard() {
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <Provider store={store}>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </Provider>
   );
 }
 

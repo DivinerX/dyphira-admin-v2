@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { User } from '../types';
 import { ChevronRight, Twitter } from 'lucide-react';
-
+import { fetchUsers } from "@/redux/slices/users";
+import { useAppDispatch } from "@/redux/hook";
 const MOCK_USERS: User[] = [
   {
     id: '1',
@@ -23,6 +24,12 @@ export const UserList: React.FC<{ onUserSelect: (user: User) => void }> = ({ onU
   const [inputPage, setInputPage] = useState('1');
   const usersPerPage = 10;
   const totalPages = Math.ceil(MOCK_USERS.length / usersPerPage);
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, []);
 
   const handlePageSubmit = (e: React.FormEvent) => {
     e.preventDefault();

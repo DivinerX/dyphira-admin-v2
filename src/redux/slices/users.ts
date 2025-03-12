@@ -4,7 +4,7 @@ import { handleAsyncThunkError } from "@/utils/handleAsyncThunkError";
 
 export const fetchUsers = createAsyncThunk(
   "users/fetchUsers",
-  async (_, thunkAPI) => {
+  async (_, thunkAPI: any) => {
     try {
       const response = await api.get("/users");
       return response.data;
@@ -16,7 +16,7 @@ export const fetchUsers = createAsyncThunk(
 
 export const fetchUser = createAsyncThunk(
   "users/fetchUser",
-  async (userId, thunkAPI) => {
+  async (userId: string, thunkAPI: any) => {
     try {
       const response = await api.get(`/users/${userId}`);
       return response.data;
