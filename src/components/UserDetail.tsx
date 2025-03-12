@@ -1,22 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { User, Interview } from '../types';
+import { User, Assessment } from '../types';
 import { ArrowLeft, Twitter, Star, Video } from 'lucide-react';
 import { InterviewReview } from './InterviewReview';
 import { fetchUserAssessments } from '@/redux/slices/users';
-import { useAppDispatch } from '@/redux/hook';
-const MOCK_INTERVIEWS: Interview[] = [
-  {
-    id: '1',
-    userId: '1',
-    date: '2024-02-20T14:00:00Z',
-    type: 'Technical',
-    status: 'Completed',
-    score: 85,
-    feedback: 'Excellent problem-solving skills, good communication.',
-    videoUrl: 'https://example.com/interview-1.mp4'
-  },
-  // Add more mock interviews as needed
-];
+import { useAppDispatch, useAppSelector } from '@/redux/hook';
+import { RootState } from '@/redux/store';
 
 interface Props {
   user: User;
@@ -24,21 +12,22 @@ interface Props {
 }
 
 export const UserDetail: React.FC<Props> = ({ user, onBack }) => {
-  const [selectedInterview, setSelectedInterview] = useState<Interview | null>(null);
+  const [selectedInterview, setSelectedInterview] = useState<Assessment | null>(null);
   const dispatch = useAppDispatch();
-
-  if (selectedInterview) {
-    return (
-      <InterviewReview
-        interview={selectedInterview}
-        onBack={() => setSelectedInterview(null)}
-      />
-    );
-  }
+  const { assessments } = useAppSelector((state: RootState) => state.users);
 
   useEffect(() => {
     dispatch(fetchUserAssessments(user._id));
   }, [dispatch, user._id]);
+
+  if (selectedInterview) {
+    return (
+      <InterviewReview
+        assessment={selectedInterview}
+        onBack={() => setSelectedInterview(null)}
+      />
+    );
+  }
 
   return (
     <div className="bg-gray-900 p-6 rounded-lg shadow-xl">
@@ -76,7 +65,7 @@ export const UserDetail: React.FC<Props> = ({ user, onBack }) => {
                     <>
                       <Twitter className="h-5 w-5 text-blue-400" />
                       <a
-                        href={`https://twitter.com/${user.twitterId}`}
+                        href={`https://twitter.com/i/user/${user.twitterId}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-400 hover:underline"
@@ -114,24 +103,30 @@ export const UserDetail: React.FC<Props> = ({ user, onBack }) => {
         <div className="bg-gray-800 p-6 rounded-lg">
           <h3 className="text-xl font-bold text-white mb-4">Interview History</h3>
           <div className="space-y-4">
-            {MOCK_INTERVIEWS.map((interview) => (
+            {assessments.map((interview) => (
               <div
-                key={interview.id}
+                key={interview._id}
                 className="bg-gray-700 p-4 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors duration-200"
                 onClick={() => setSelectedInterview(interview)}
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="text-white font-medium">{interview.type} Interview</p>
+                    <p className="text-white font-medium">{user.username}'s interview</p>
                     <p className="text-gray-400 text-sm">
-                      {new Date(interview.date).toLocaleDateString()}
+                      {new Date(interview.completedAt).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="flex items-center space-x-3">
-                    {interview.score && (
+                    {interview.score ? (
                       <div className="flex items-center">
                         <Star className="h-4 w-4 text-yellow-400 mr-1" />
-                        <span className="text-white">{interview.score}</span>
+                        <span className="text-white">
+                          {Object.values(interview.score).reduce((sum, score) => sum + (score || 0), 0)}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center">
+                        <span className="text-gray-400">No score yet</span>
                       </div>
                     )}
                     <Video className="h-4 w-4 text-blue-400" />

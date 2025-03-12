@@ -39,6 +39,19 @@ export const fetchUserAssessments = createAsyncThunk(
   },
 );
 
+
+export const setScoreAssessment = createAsyncThunk(
+  "users/setScoreAssessment",
+  async ({ assessmentId, data }: { assessmentId: string; data: any }, thunkAPI) => {
+    try {
+      const response = await api.patch(`/assessments/score/${assessmentId}`, data);
+      return response.data;
+    } catch (error) {
+      return handleAsyncThunkError(error, thunkAPI);
+    }
+  }
+);
+
 export type TUserState = {
   users: User[];
   user: User | {};
@@ -84,6 +97,19 @@ const usersSlice = createSlice({
         state.assessments = action.payload;
       })
       .addCase(fetchUserAssessments.rejected, (state) => {
+        state.status = "failed";
+      });
+    builder
+      .addCase(setScoreAssessment.pending, (state) => {
+        state.status = "pending";
+      })
+      .addCase(setScoreAssessment.fulfilled, (state, action) => {
+        state.status = "fulfilled";
+        state.assessments = state.assessments.map((assessment) =>
+          assessment._id === action.payload._id ? action.payload : assessment
+        );
+      })
+      .addCase(setScoreAssessment.rejected, (state) => {
         state.status = "failed";
       });
   },

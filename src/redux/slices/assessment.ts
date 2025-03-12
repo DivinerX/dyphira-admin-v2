@@ -14,18 +14,6 @@ export const fetchAssessment = createAsyncThunk(
   },
 );
 
-export const fetchAssessmentAnswers = createAsyncThunk(
-  "assessment/fetchAssessmentAnswers",
-  async (assessmentId: string, thunkAPI: any) => {
-    try {
-      const response = await api.get(`/assessments/${assessmentId}/answers`);
-      return response.data;
-    } catch (error) {
-      return handleAsyncThunkError(error, thunkAPI);
-    }
-  },
-);
-
 export const fetchAssessmentVideo = createAsyncThunk(
   "assessment/fetchAssessmentVideo",
   async (filename, thunkAPI) => {
@@ -40,7 +28,7 @@ export const fetchAssessmentVideo = createAsyncThunk(
 const assessmentSlice = createSlice({
   name: "assessment",
   initialState: {
-    assessment: null,
+    assessments: null,
     answers: [],
     videoUrl: null,
     status: "idle",
@@ -54,25 +42,15 @@ const assessmentSlice = createSlice({
       })
       .addCase(fetchAssessment.fulfilled, (state, action) => {
         state.status = "fulfilled";
-        state.assessment = action.payload;
+        state.assessments = action.payload;
       })
       .addCase(fetchAssessment.rejected, (state) => {
         state.status = "failed";
       });
     builder
-      .addCase(fetchAssessmentAnswers.pending, (state) => {
-        state.status = "pending";
-      })
-      .addCase(fetchAssessmentAnswers.fulfilled, (state, action) => {
-        state.status = "fulfilled";
-        state.answers = action.payload;
-      })
-      .addCase(fetchAssessmentAnswers.rejected, (state) => {
-        state.status = "failed";
+      .addCase(fetchAssessmentVideo.fulfilled, (state, action) => {
+        state.videoUrl = action.payload.url;
       });
-    builder.addCase(fetchAssessmentVideo.fulfilled, (state, action) => {
-      state.videoUrl = action.payload.url;
-    });
   },
 });
 
