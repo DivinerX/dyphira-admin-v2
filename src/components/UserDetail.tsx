@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { User, Interview } from '../types';
 import { ArrowLeft, Twitter, Star, Video } from 'lucide-react';
 import { InterviewReview } from './InterviewReview';
-import { fetchUser, fetchUserAssessments } from '@/redux/slices/users';
+import { fetchUserAssessments } from '@/redux/slices/users';
 import { useAppDispatch } from '@/redux/hook';
 const MOCK_INTERVIEWS: Interview[] = [
   {
