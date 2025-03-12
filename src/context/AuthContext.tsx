@@ -1,10 +1,10 @@
 import React, { useCallback, useState } from "react";
-import { login, logout, fetchUser, register } from "../api/auth";
-import storage from "../utils/storage";
+import { login, logout, fetchUser, register } from "@/api/auth";
+import storage from "@/utils/storage";
 
-const AuthContext = React.createContext(undefined);
+const AuthContext = React.createContext<any>(undefined);
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setLoading] = useState(false);
 
@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
 
     setLoading(true);
     try {
-      const res = await fetchUser();
+      const res = await fetchUser({});
       setUser(res.data);
     } catch (error) {
       setUser(null);
@@ -28,14 +28,14 @@ export const AuthProvider = ({ children }) => {
     fetchCurrentUser();
   }, [fetchCurrentUser]);
 
-  const signUp = async (credentials) => {
+  const signUp = async (credentials: any) => {
     setLoading(true);
     try {
-      const res = await register(credentials);
+      const res = await register(credentials, {});
       storage.setAccessToken(res.data.accessToken);
       storage.setRefreshToken(res.data.refreshToken);
       await fetchCurrentUser();
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
       if (error.response && error.response.status === 404) {
         signOut();
@@ -48,14 +48,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const signIn = async (credentials) => {
+  const signIn = async (credentials: any) => {
     setLoading(true);
     try {
-      const res = await login(credentials);
+      const res = await login(credentials, {});
       storage.setAccessToken(res.data.accessToken);
       storage.setRefreshToken(res.data.refreshToken);
       await fetchCurrentUser();
-    } catch (error) {
+    } catch (error: any) {
       setUser(null);
       throw new Error(
         error.response?.data?.error || "Login failed. Please try again.",

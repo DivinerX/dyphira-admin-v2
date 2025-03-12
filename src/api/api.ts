@@ -3,7 +3,7 @@ import storage from "../utils/storage";
 import axiosInstance, { axiosParams } from "../lib/axios";
 import { toast } from "react-toastify";
 
-const handleAuthError = (message) => {
+const handleAuthError = (message: string) => {
   toast.dismiss();
   toast.error(message, {
     theme: "dark",
@@ -43,7 +43,7 @@ const refreshAccessToken = async () => {
 
 // Add an interceptor to add the access token to the headers of each request
 axiosInstance.interceptors.request.use(
-  async (config) => {
+  async (config: any) => {
     // Get the current access token from storage
     const accessToken = storage.getAccessToken();
     if (accessToken) {
@@ -52,25 +52,25 @@ axiosInstance.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error),
+  (error: any) => Promise.reject(error),
 );
 
 let isRefreshing = false;
-let refreshSubscribers = [];
+let refreshSubscribers: any[] = [];
 
-const addSubscriber = (callback) => {
+const addSubscriber = (callback: any) => {
   refreshSubscribers.push(callback);
 };
 
-const onRefreshed = (token) => {
-  refreshSubscribers.forEach((callback) => callback(token));
+const onRefreshed = (token: any) => {
+  refreshSubscribers.forEach((callback: any) => callback(token));
   refreshSubscribers = [];
 };
 
 //Add an interceptor to refresh the access token if it is expired
 axiosInstance.interceptors.response.use(
-  (response) => response,
-  async (error) => {
+  (response: any) => response,
+  async (error: any) => {
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -81,7 +81,7 @@ axiosInstance.interceptors.response.use(
 
       if (isRefreshing) {
         return new Promise((resolve) => {
-          addSubscriber((token) => {
+          addSubscriber((token: any) => {
             originalRequest.headers.Authorization = `Bearer ${token}`;
             resolve(axiosInstance(originalRequest));
           });
@@ -108,16 +108,16 @@ axiosInstance.interceptors.response.use(
   },
 );
 
-const didAbort = (error) => axios.isCancel(error);
+const didAbort = (error: any) => axios.isCancel(error);
 
 const getCancelSource = () => axios.CancelToken.source();
 
-export const isApiError = (error) => {
+export const isApiError = (error: any) => {
   return axios.isAxiosError(error);
 };
 
-const withAbort = (fn) => {
-  const executor = async (...args) => {
+const withAbort = (fn: any) => {
+  const executor = async (...args: any[]) => {
     const originalConfig = args[args.length - 1];
     // Extract abort property from the config
     const { abort, ...config } = originalConfig;
@@ -138,10 +138,10 @@ const withAbort = (fn) => {
         const [url] = args;
         return await fn(url, config);
       }
-    } catch (error) {
+    } catch (error: any) {
       // Add "aborted" property to the error if the request was cancelled
       if (didAbort(error)) {
-        error.aborted = true;
+        (error as any).aborted = true;
       }
 
       throw error;
@@ -151,8 +151,8 @@ const withAbort = (fn) => {
   return executor;
 };
 
-const withLogger = async (promise) =>
-  promise.catch((error) => {
+const withLogger = async (promise: any) =>
+  promise.catch((error: any) => {
     /*
     Always log errors in dev environment
     if (pimport.meta.NODE_ENV !== 'development') throw error      
@@ -181,16 +181,17 @@ const withLogger = async (promise) =>
   });
 
 // Main api function
-const api = (axios) => {
+const api = (axios: any) => {
   return {
-    get: (url, config = {}) => withLogger(withAbort(axios.get)(url, config)),
-    delete: (url, config = {}) =>
+    get: (url: string, config: any = {}) =>
+      withLogger(withAbort(axios.get)(url, config)),
+    delete: (url: string, config: any = {}) =>
       withLogger(withAbort(axios.delete)(url, config)),
-    post: (url, body, config = {}) =>
+    post: (url: string, body: any, config: any = {}) =>
       withLogger(withAbort(axios.post)(url, body, config)),
-    patch: (url, body, config = {}) =>
+    patch: (url: string, body: any, config: any = {}) =>
       withLogger(withAbort(axios.patch)(url, body, config)),
-    put: (url, body, config = {}) =>
+    put: (url: string, body: any, config: any = {}) =>
       withLogger(withAbort(axios.put)(url, body, config)),
   };
 };

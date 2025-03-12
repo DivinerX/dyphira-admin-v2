@@ -1,5 +1,5 @@
 import { isAxiosError } from "axios";
-export const handleAsyncThunkError = (error, { rejectWithValue }) => {
+export const handleAsyncThunkError = (error: any, { rejectWithValue }: any) => {
   // Handle network errors
   if (isAxiosError(error) && !error.response) {
     return rejectWithValue({

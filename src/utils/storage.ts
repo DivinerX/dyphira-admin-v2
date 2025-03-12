@@ -6,7 +6,7 @@ const storage = {
   getAccessToken: () => {
     return window.localStorage.getItem(ACCESS_TOKEN_KEY);
   },
-  setAccessToken: (accessToken) => {
+  setAccessToken: (accessToken: string) => {
     window.localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
   },
   clearAccessToken: () => {
@@ -15,7 +15,7 @@ const storage = {
   getRefreshToken: () => {
     return window.localStorage.getItem(REFRESH_TOKEN_KEY);
   },
-  setRefreshToken: (refreshToken) => {
+  setRefreshToken: (refreshToken: string) => {
     window.localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
   },
   clearRefreshToken: () => {

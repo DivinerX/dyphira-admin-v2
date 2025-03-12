@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { AuthProvider, useAuth } from './components/AuthContext';
+import { useState } from 'react';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { LoginPage } from './components/LoginPage';
 import { UserList } from './components/UserList';
 import { UserDetail } from './components/UserDetail';
@@ -50,9 +50,9 @@ function App() {
 }
 
 function AppContent() {
-  const { auth } = useAuth();
+  const { isLoggedIn } = useAuth();
 
-  return auth.isAuthenticated ? <Dashboard /> : <LoginPage />;
+  return isLoggedIn ? <Dashboard /> : <LoginPage />;
 }
 
 export default App;
