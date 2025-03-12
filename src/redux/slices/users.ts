@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "@/api/api";
 import { handleAsyncThunkError } from "@/utils/handleAsyncThunkError";
+import { User, Assessment } from "@/types";
 
 export const fetchUsers = createAsyncThunk(
   "users/fetchUsers",
@@ -26,30 +27,6 @@ export const fetchUser = createAsyncThunk(
   },
 );
 
-export const fetchAllRewards = createAsyncThunk(
-  "users/fetchAllRewards",
-  async (_, thunkAPI) => {
-    try {
-      const response = await api.get("/rewards/all");
-      return response.data;
-    } catch (error) {
-      return handleAsyncThunkError(error, thunkAPI);
-    }
-  },
-);
-
-export const fetchAllAssessments = createAsyncThunk(
-  "users/fetchAllAssessments",
-  async (_, thunkAPI) => {
-    try {
-      const response = await api.get("/assessments/all");
-      return response.data;
-    } catch (error) {
-      return handleAsyncThunkError(error, thunkAPI);
-    }
-  },
-);
-
 export const fetchUserAssessments = createAsyncThunk(
   "users/fetchUserAssessments",
   async (userId, thunkAPI) => {
@@ -62,16 +39,25 @@ export const fetchUserAssessments = createAsyncThunk(
   },
 );
 
+export type TUserState = {
+  users: User[];
+  user: User | {};
+  assessments: Assessment[];
+  status: "idle" | "pending" | "fulfilled" | "failed";
+  error: string | null;
+};
+
+const initialState: TUserState = {
+  users: [],
+  user: {},
+  assessments: [],
+  status: "idle",
+  error: null,
+};
+
 const usersSlice = createSlice({
-  name: "sections",
-  initialState: {
-    users: [],
-    assessments: [],
-    user: {},
-    rewards: [],
-    status: "idle",
-    error: null,
-  },
+  name: "users",
+  initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
@@ -99,28 +85,6 @@ const usersSlice = createSlice({
       })
       .addCase(fetchUserAssessments.rejected, (state) => {
         state.status = "failed";
-      });
-    builder
-      .addCase(fetchAllRewards.fulfilled, (state, action) => {
-        state.status = "fulfilled";
-        state.rewards = action.payload;
-      })
-      .addCase(fetchAllRewards.rejected, (state) => {
-        state.status = "failed";
-      })
-      .addCase(fetchAllRewards.pending, (state) => {
-        state.status = "pending";
-      });
-    builder
-      .addCase(fetchAllAssessments.fulfilled, (state, action) => {
-        state.status = "fulfilled";
-        state.assessments = action.payload;
-      })
-      .addCase(fetchAllAssessments.rejected, (state) => {
-        state.status = "failed";
-      })
-      .addCase(fetchAllAssessments.pending, (state) => {
-        state.status = "pending";
       });
   },
 });

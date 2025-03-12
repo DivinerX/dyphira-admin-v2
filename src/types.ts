@@ -1,14 +1,18 @@
 export interface User {
-  id: string;
-  name: string;
+  _id: string;
+  username: string;
   email: string;
-  referredBy: string | null;
+  referredBy: {
+    email: string;
+    _id: string;
+  } | null;
   createdAt: string;
   referralCount: number;
   xp: number;
   credits: number;
-  twitterConnected: boolean;
-  twitterHandle?: string;
+  verified: boolean;
+  twitterId?: string;
+  twitterScore?: number | null;
 }
 
 export interface Interview {
@@ -20,4 +24,13 @@ export interface Interview {
   score?: number;
   feedback?: string;
   videoUrl: string;
+}
+
+export interface Assessment {
+  _id: string;
+  userId: string;
+  date: string;
+  score: number;
+  feedback: string;
+  videoUrl: string; 
 }
