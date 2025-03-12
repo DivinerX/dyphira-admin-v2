@@ -12,13 +12,32 @@ interface Props {
 }
 
 export const UserDetail: React.FC<Props> = ({ user, onBack }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedInterview, setSelectedInterview] = useState<Assessment | null>(null);
   const dispatch = useAppDispatch();
   const { assessments } = useAppSelector((state: RootState) => state.users);
 
   useEffect(() => {
-    dispatch(fetchUserAssessments(user._id));
+    setIsLoading(true);
+    dispatch(fetchUserAssessments(user._id))
+      .finally(() => setIsLoading(false));
   }, [dispatch, user._id]);
+
+  // Loading skeleton component
+  const InterviewSkeleton = () => (
+    <div className="bg-gray-700 p-4 rounded-lg animate-pulse">
+      <div className="flex justify-between items-start">
+        <div>
+          <div className="h-5 w-32 bg-gray-600 rounded mb-2"></div>
+          <div className="h-4 w-24 bg-gray-600 rounded"></div>
+        </div>
+        <div className="flex items-center space-x-3">
+          <div className="h-4 w-16 bg-gray-600 rounded"></div>
+          <div className="h-4 w-4 bg-gray-600 rounded"></div>
+        </div>
+      </div>
+    </div>
+  );
 
   if (selectedInterview) {
     return (
@@ -102,39 +121,51 @@ export const UserDetail: React.FC<Props> = ({ user, onBack }) => {
 
         <div className="bg-gray-800 p-6 rounded-lg">
           <h3 className="text-xl font-bold text-white mb-4">Interview History</h3>
-          <div className="space-y-4">
-            {assessments.map((interview) => (
-              <div
-                key={interview._id}
-                className="bg-gray-700 p-4 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors duration-200"
-                onClick={() => setSelectedInterview(interview)}
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-white font-medium">{user.username}'s interview</p>
-                    <p className="text-gray-400 text-sm">
-                      {new Date(interview.completedAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    {interview.score ? (
-                      <div className="flex items-center">
-                        <Star className="h-4 w-4 text-yellow-400 mr-1" />
-                        <span className="text-white">
-                          {Math.round(Object.values(interview.score).reduce((sum, score) => sum + (score || 0), 0) / Object.keys(interview.score).length)}
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center">
-                        <span className="text-gray-400">No score yet</span>
-                      </div>
-                    )}
-                    <Video className="h-4 w-4 text-blue-400" />
+          {isLoading ? (
+            <div className="space-y-4">
+              {[...Array(3)].map((_, index) => (
+                <InterviewSkeleton key={index} />
+              ))}
+            </div>
+          ) : assessments.length === 0 ? (
+            <div className="bg-gray-700 p-6 rounded-lg text-center">
+              <p className="text-gray-400">No interviews found</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {assessments.map((interview) => (
+                <div
+                  key={interview._id}
+                  className="bg-gray-700 p-4 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors duration-200"
+                  onClick={() => setSelectedInterview(interview)}
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-white font-medium">{user.username}'s interview</p>
+                      <p className="text-gray-400 text-sm">
+                        {new Date(interview.completedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      {interview.score ? (
+                        <div className="flex items-center">
+                          <Star className="h-4 w-4 text-yellow-400 mr-1" />
+                          <span className="text-white">
+                            {Math.round(Object.values(interview.score).reduce((sum, score) => sum + (score || 0), 0) / Object.keys(interview.score).length)}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center">
+                          <span className="text-gray-400">No score yet</span>
+                        </div>
+                      )}
+                      <Video className="h-4 w-4 text-blue-400" />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

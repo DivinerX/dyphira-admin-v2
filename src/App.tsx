@@ -6,6 +6,8 @@ import { UserDetail } from './components/UserDetail';
 import { User } from './types';
 import { store } from './redux/store';
 import { Provider } from 'react-redux';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Dashboard() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -48,6 +50,18 @@ function App() {
     <Provider store={store}>
       <AuthProvider>
         <AppContent />
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
+        />
       </AuthProvider>
     </Provider>
   );
