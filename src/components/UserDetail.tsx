@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { User, Interview } from '../types';
 import { ArrowLeft, Twitter, Star, Video } from 'lucide-react';
 import { InterviewReview } from './InterviewReview';
-
+import { fetchUser, fetchUserAssessments } from '@/redux/slices/users';
+import { useAppDispatch } from '@/redux/hook';
 const MOCK_INTERVIEWS: Interview[] = [
   {
     id: '1',
@@ -24,6 +25,7 @@ interface Props {
 
 export const UserDetail: React.FC<Props> = ({ user, onBack }) => {
   const [selectedInterview, setSelectedInterview] = useState<Interview | null>(null);
+  const dispatch = useAppDispatch();
 
   if (selectedInterview) {
     return (
@@ -33,6 +35,10 @@ export const UserDetail: React.FC<Props> = ({ user, onBack }) => {
       />
     );
   }
+
+  useEffect(() => {
+    dispatch(fetchUserAssessments(user._id));
+  }, [dispatch, user._id]);
 
   return (
     <div className="bg-gray-900 p-6 rounded-lg shadow-xl">
@@ -51,7 +57,7 @@ export const UserDetail: React.FC<Props> = ({ user, onBack }) => {
             <div className="space-y-4">
               <div>
                 <label className="text-gray-400 text-sm">Name</label>
-                <p className="text-white font-medium">{user.name}</p>
+                <p className="text-white font-medium">{user.username}</p>
               </div>
               <div>
                 <label className="text-gray-400 text-sm">Email</label>
@@ -66,16 +72,16 @@ export const UserDetail: React.FC<Props> = ({ user, onBack }) => {
               <div>
                 <label className="text-gray-400 text-sm">Twitter</label>
                 <div className="flex items-center space-x-3">
-                  {user.twitterConnected ? (
+                  {user.twitterId ? (
                     <>
                       <Twitter className="h-5 w-5 text-blue-400" />
                       <a
-                        href={`https://twitter.com/${user.twitterHandle}`}
+                        href={`https://twitter.com/${user.twitterId}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-400 hover:underline"
                       >
-                        @{user.twitterHandle}
+                        @{user.username}
                       </a>
                     </>
                   ) : (
@@ -98,7 +104,7 @@ export const UserDetail: React.FC<Props> = ({ user, onBack }) => {
                 <p className="text-gray-300 text-sm">Credits</p>
               </div>
               <div className="bg-gray-700 p-4 rounded-lg text-center">
-                <p className="text-blue-400 text-2xl font-bold">{user.referralCount}</p>
+                <p className="text-blue-400 text-2xl font-bold">{user.fund.referrals.length}</p>
                 <p className="text-gray-300 text-sm">Referrals</p>
               </div>
             </div>

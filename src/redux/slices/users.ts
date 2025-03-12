@@ -29,7 +29,7 @@ export const fetchUser = createAsyncThunk(
 
 export const fetchUserAssessments = createAsyncThunk(
   "users/fetchUserAssessments",
-  async (userId, thunkAPI) => {
+  async (userId: string, thunkAPI: any) => {
     try {
       const response = await api.get(`users/${userId}/assessments`);
       return response.data;

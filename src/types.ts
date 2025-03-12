@@ -6,6 +6,9 @@ export interface User {
     email: string;
     _id: string;
   } | null;
+  fund: {
+    referrals: User[];
+  };
   createdAt: string;
   referralCount: number;
   xp: number;
