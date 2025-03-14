@@ -43,6 +43,7 @@ export const UserDetail: React.FC<Props> = ({ user, onBack }) => {
     return (
       <InterviewReview
         assessment={selectedInterview}
+        user={user}
         onBack={() => setSelectedInterview(null)}
       />
     );

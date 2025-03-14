@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { Assessment } from '../types';
-import { 
-  ArrowLeft, 
+import { Assessment, User } from '../types';
+import {
+  ArrowLeft,
   Brain, // for IQ
   Megaphone, // for evangelism
   Target, // for determination
   Zap, // for effectiveness
   Eye, // for vision
-  Star 
+  Star,
+  TwitterIcon
 } from 'lucide-react';
 import {
   Chart as ChartJS,
@@ -34,6 +35,7 @@ ChartJS.register(
 interface Props {
   assessment: Assessment;
   onBack: () => void;
+  user: User;
 }
 
 interface ScoreCategories {
@@ -74,10 +76,16 @@ const categoryConfig = {
     color: 'text-green-400',
     bgColor: 'bg-green-400/10',
     borderColor: 'border-green-400/20'
+  },
+  socialCapital: {
+    icon: TwitterIcon,
+    color: 'text-indigo-400',
+    bgColor: 'bg-indigo-400/10',
+    borderColor: 'border-indigo-400/20'
   }
 };
 
-export const InterviewReview: React.FC<Props> = ({ assessment, onBack }) => {
+export const InterviewReview: React.FC<Props> = ({ assessment, onBack, user }) => {
   const dispatch = useAppDispatch();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [score, setScore] = useState<ScoreCategories>({
@@ -88,10 +96,10 @@ export const InterviewReview: React.FC<Props> = ({ assessment, onBack }) => {
     vision: assessment.score?.vision || 0,
   });
   const [feedback, setFeedback] = useState(assessment.feedback || '');
-
+  const [socialCapital, setSocialCapital] = useState(user.twitterScore || 0);
   const handleSubmit = () => {
     setIsSubmitting(true);
-    dispatch(setScoreAssessment({ assessmentId: assessment._id, data: { score, feedback } }))
+    dispatch(setScoreAssessment({ assessmentId: assessment._id, data: { score, feedback, socialCapital } }))
       .then(() => {
         setIsSubmitting(false);
         toast.success('Review submitted successfully');
@@ -100,6 +108,10 @@ export const InterviewReview: React.FC<Props> = ({ assessment, onBack }) => {
         setIsSubmitting(false);
         toast.error('Failed to submit review');
       });
+  };
+
+  const handleSocialCapitalChange = (value: number) => {
+    setSocialCapital(value);
   };
 
   const handleScoreChange = (category: keyof ScoreCategories, value: number) => {
@@ -115,10 +127,10 @@ export const InterviewReview: React.FC<Props> = ({ assessment, onBack }) => {
   };
 
   const radarData = {
-    labels: Object.keys(score),
+    labels: [...Object.keys(score), 'social capital'],
     datasets: [
       {
-        data: Object.values(score),
+        data: [...Object.values(score), socialCapital],
         backgroundColor: 'rgba(99, 102, 241, 0.15)',
         borderColor: 'rgba(99, 102, 241, 0.8)',
         borderWidth: 1.5,
@@ -234,9 +246,9 @@ export const InterviewReview: React.FC<Props> = ({ assessment, onBack }) => {
                   {/* Radar Chart */}
                   <div className="bg-gray-700/50 p-3 rounded-lg mb-2">
                     <div className="h-[220px] relative">
-                      <Radar 
-                        data={radarData} 
-                        options={radarOptions} 
+                      <Radar
+                        data={radarData}
+                        options={radarOptions}
                       />
                     </div>
                   </div>
@@ -252,6 +264,32 @@ export const InterviewReview: React.FC<Props> = ({ assessment, onBack }) => {
               {/* Score Inputs */}
               <div className="bg-gray-700/50 p-6 rounded-lg">
                 <div className="grid grid-cols-2 gap-4">
+
+                  <div key="social-capital" className={`bg-indigo-400/10 border border-indigo-400/20 p-2 rounded-lg`}>
+                    <div className="flex items-center mb-1">
+                      <TwitterIcon className={`h-4 w-4 text-indigo-400 mr-2`} />
+                      <span className="text-gray-300 text-sm">Social Capital</span>
+                      <span className="text-white font-semibold ml-auto">{user.twitterScore}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={socialCapital}
+                        onChange={(e) => handleSocialCapitalChange(Number(e.target.value))}
+                        className="flex-1 h-1 accent-indigo-500"
+                      />
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={socialCapital}
+                        onChange={(e) => handleSocialCapitalChange(Number(e.target.value))}
+                        className="w-12 px-1 py-0.5 bg-gray-600 border border-gray-500 rounded text-white text-xs text-center"
+                      />
+                    </div>
+                  </div>
                   {Object.entries(score).map(([category, value]) => {
                     const config = categoryConfig[category as keyof typeof categoryConfig];
                     const Icon = config.icon;
