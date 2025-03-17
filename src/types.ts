@@ -11,7 +11,7 @@ export interface User {
   };
   createdAt: string;
   referralCount: number;
-  xp: number;
+  socialCapital?: number;
   credits: number;
   verified: boolean;
   twitterId?: string;

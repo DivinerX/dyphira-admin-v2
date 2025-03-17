@@ -39,6 +39,22 @@ export const UserDetail: React.FC<Props> = ({ user, onBack }) => {
     </div>
   );
 
+  // Calculate average score from all assessments
+  const calculateAverageScore = (assessments: Assessment[]) => {
+    if (!assessments || assessments.length === 0) return 'N/A';
+    
+    const validAssessments = assessments.filter(a => a.score);
+    if (validAssessments.length === 0) return 'N/A';
+    
+    const totalScore = validAssessments.reduce((sum, assessment) => {
+      const categoryScores = Object.values(assessment.score);
+      const assessmentAvg = categoryScores.reduce((sum, score) => sum + (score || 0), 0) / categoryScores.length;
+      return sum + assessmentAvg;
+    }, 0);
+    
+    return Math.round(totalScore / validAssessments.length);
+  };
+
   if (selectedInterview) {
     return (
       <InterviewReview
@@ -92,6 +108,10 @@ export const UserDetail: React.FC<Props> = ({ user, onBack }) => {
                       >
                         @{user.username}
                       </a>
+                      <span className="flex items-center text-red-400 text-sm">
+                        <Star className="h-5 w-5 text-red-400 mr-2" />
+                        {user.socialCapital || 0}
+                      </span>
                     </>
                   ) : (
                     <span className="text-gray-500">Not connected</span>
@@ -105,7 +125,12 @@ export const UserDetail: React.FC<Props> = ({ user, onBack }) => {
             <h3 className="text-xl font-bold text-white mb-4">Stats</h3>
             <div className="grid grid-cols-3 gap-4">
               <div className="bg-gray-700 p-4 rounded-lg text-center">
-                <p className="text-yellow-400 text-2xl font-bold">{user.xp}</p>
+                <div className="flex items-center justify-center">
+                  <Star className="h-5 w-5 text-yellow-400 mr-2" />
+                  <p className="text-yellow-400 text-2xl font-bold">
+                    {calculateAverageScore(assessments)}
+                  </p>
+                </div>
                 <p className="text-gray-300 text-sm">XP</p>
               </div>
               <div className="bg-gray-700 p-4 rounded-lg text-center">

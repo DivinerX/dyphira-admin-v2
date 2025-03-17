@@ -85,7 +85,7 @@ const categoryConfig = {
   }
 };
 
-export const InterviewReview: React.FC<Props> = ({ assessment, onBack, user }) => {
+export const InterviewReview: React.FC<Props> = ({ assessment, onBack }) => {
   const dispatch = useAppDispatch();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [score, setScore] = useState<ScoreCategories>({
@@ -96,10 +96,9 @@ export const InterviewReview: React.FC<Props> = ({ assessment, onBack, user }) =
     vision: assessment.score?.vision || 0,
   });
   const [feedback, setFeedback] = useState(assessment.feedback || '');
-  const [socialCapital, setSocialCapital] = useState(user.twitterScore || 0);
   const handleSubmit = () => {
     setIsSubmitting(true);
-    dispatch(setScoreAssessment({ assessmentId: assessment._id, data: { score, feedback, socialCapital } }))
+    dispatch(setScoreAssessment({ assessmentId: assessment._id, data: { score, feedback } }))
       .then(() => {
         setIsSubmitting(false);
         toast.success('Review submitted successfully');
@@ -108,10 +107,6 @@ export const InterviewReview: React.FC<Props> = ({ assessment, onBack, user }) =
         setIsSubmitting(false);
         toast.error('Failed to submit review');
       });
-  };
-
-  const handleSocialCapitalChange = (value: number) => {
-    setSocialCapital(value);
   };
 
   const handleScoreChange = (category: keyof ScoreCategories, value: number) => {
@@ -127,10 +122,10 @@ export const InterviewReview: React.FC<Props> = ({ assessment, onBack, user }) =
   };
 
   const radarData = {
-    labels: [...Object.keys(score), 'social capital'],
+    labels: [...Object.keys(score)],
     datasets: [
       {
-        data: [...Object.values(score), socialCapital],
+        data: [...Object.values(score)],
         backgroundColor: 'rgba(99, 102, 241, 0.15)',
         borderColor: 'rgba(99, 102, 241, 0.8)',
         borderWidth: 1.5,
@@ -264,32 +259,6 @@ export const InterviewReview: React.FC<Props> = ({ assessment, onBack, user }) =
               {/* Score Inputs */}
               <div className="bg-gray-700/50 p-6 rounded-lg">
                 <div className="grid grid-cols-2 gap-4">
-
-                  <div key="social-capital" className={`bg-indigo-400/10 border border-indigo-400/20 p-2 rounded-lg`}>
-                    <div className="flex items-center mb-1">
-                      <TwitterIcon className={`h-4 w-4 text-indigo-400 mr-2`} />
-                      <span className="text-gray-300 text-sm">Social Capital</span>
-                      <span className="text-white font-semibold ml-auto">{user.twitterScore}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={socialCapital}
-                        onChange={(e) => handleSocialCapitalChange(Number(e.target.value))}
-                        className="flex-1 h-1 accent-indigo-500"
-                      />
-                      <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={socialCapital}
-                        onChange={(e) => handleSocialCapitalChange(Number(e.target.value))}
-                        className="w-12 px-1 py-0.5 bg-gray-600 border border-gray-500 rounded text-white text-xs text-center"
-                      />
-                    </div>
-                  </div>
                   {Object.entries(score).map(([category, value]) => {
                     const config = categoryConfig[category as keyof typeof categoryConfig];
                     const Icon = config.icon;
